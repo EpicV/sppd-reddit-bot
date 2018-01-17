@@ -1,0 +1,1 @@
+worker: python deck-bot.py

@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# log file
+sppd.log
+
+# resources
+resources/
