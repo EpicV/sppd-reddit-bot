@@ -102,13 +102,18 @@ def main():
 
 def process_stream(table):
     if table == 'submissions':
-        logger.info('Start streaming submissions')
-        for submission in subreddit.stream.submissions():
+        logger.info('Start checking submissions')
+        # for submission in subreddit.stream.submissions():
+        for submission in subreddit.new(limit=100):
             process_post(submission)
+        logger.info('Finish checking submissions')
+
     elif table == 'comments':
-        logger.info('Start streaming comments')
-        for comment in subreddit.stream.comments():
+        logger.info('Start checking comments')
+        # for comment in subreddit.stream.comments():
+        for comment in subreddit.comments(limit=100):
             process_post(comment)
+        logger.info('Finish checking submissions')
 
 def process_post(post):
     if post.author == reddit.user.me():
