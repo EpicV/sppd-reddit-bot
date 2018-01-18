@@ -67,6 +67,8 @@ process = CrawlerProcess({
     'FEED_URI': 'file:///' + card_json
 })
 
-os.remove(card_json)
+if os.path.exists(card_json):
+    os.remove(card_json)
+
 process.crawl(MySpider)
 process.start()
