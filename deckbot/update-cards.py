@@ -1,11 +1,13 @@
-import sqlite3
+# import sqlite3
+import os
+from urllib import parse
+import psycopg2
 import logging
 import json
-import os
 
 # get abs path
 path = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(path, 'data', 'db.sqlite3')
+# db_path = os.path.join(path, 'data', 'db.sqlite3')
 log_path = os.path.join(path, 'data', 'sppd.log')
 card_json = os.path.join(path, 'data', 'cards.json')
 
@@ -29,7 +31,25 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 
 # connect database
-conn = sqlite3.connect(db_path)
+# conn = sqlite3.connect(db_path)
+if 'DATABASE_URL' in os.environ:
+    parse.uses_netloc.append('postgres')
+    url = parse.urlparse(os.environ['DATABASE_URL'])
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+else:
+    conn = psycopg2.connect(
+        database='sppd_db',
+        user='postgres',
+        password='postgres',
+        host='localhost',
+        port='5432'
+    )
 c = conn.cursor()
 
 # create table
@@ -55,6 +75,7 @@ for key, card in CARD_DATA.items():
             (key, card['name'], card['theme'], card['type'], card['class'],
                 card['rarity'], card['cost'],))
         logger.info('Added card: ' + key + ' - ' + card['name'])
+        print('Added card:', key, '-', card['name'])
 
     # update card
     elif (card['name'] != data[1] or card['theme'] != data[2]
@@ -65,6 +86,7 @@ for key, card in CARD_DATA.items():
             WHERE id = ?''', (card['name'], card['theme'], card['type'],
                 card['class'], card['rarity'], card['cost'], key,))
         logger.info('Updated card: ' + key + ' - ' + card['name'])
+        print('Updated card:', key, '-', card['name'])
 
     # update statement
     nec_query += key + ', '
@@ -76,11 +98,14 @@ if len(nec) > 0:
     ids = ', '.join(map(str,list(zip(*nec))[0]))
     c.execute('DELETE FROM cards WHERE id IN (' + ids + ')')
     logger.info('Deleted cards: ' + ids)
+    print('Deleted cards:', ids)
 
 # commit changes
 logger.info('Committing changes...')
+print('Committing changes...')
 conn.commit()
 
 # close connection
 logger.info('Done! Closing connection...')
+print('Done! Closing connection...')
 conn.close()

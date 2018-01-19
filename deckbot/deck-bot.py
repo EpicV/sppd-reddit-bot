@@ -107,19 +107,21 @@ def main():
     thread2.join()
 
 def process_stream(table):
+    logger.info('Start checking ' + table)
+    print('Start checking', table)
+
     if table == 'submissions':
-        logger.info('Start checking submissions')
         # for submission in subreddit.stream.submissions():
         for submission in subreddit.new(limit=100):
             process_post(submission)
-        logger.info('Finish checking submissions')
 
     elif table == 'comments':
-        logger.info('Start checking comments')
         # for comment in subreddit.stream.comments():
         for comment in subreddit.comments(limit=100):
             process_post(comment)
-        logger.info('Finish checking submissions')
+
+    logger.info('Finish checking ' + table)
+    print('Finish checking', table)
 
 def process_post(post):
     if post.author == reddit.user.me():
@@ -142,6 +144,7 @@ def process_post(post):
 
         if len(matches) > 0:
             logger.info('Found decks in ' + table[:-1] + ' ' + post.id)
+            print('Found decks in', table[:-1], post.id)
 
         for match_index, match in enumerate(matches):
             reply += prepare_reply(match_index + 1, match, len(matches))
@@ -152,10 +155,12 @@ def process_post(post):
                 cursor.execute('INSERT INTO ' + table + ' VALUES (?)', (post.id,))
                 conn.commit()
                 logger.info('Replied to ' + table[:-1] + ' ' + post.id)
+                print('Replied to', table[:-1], post.id)
             except:
                 time.sleep(30)
                 process_stream(post, table)
                 logger.exception('Unable to reply ' + table[:-1] + ' ' + post.id)
+                print('Unable to reply', table[:-1], post.id)
 
             cursor.execute('SELECT * FROM ' + table)
             if len(cursor.fetchall()) > MAX_REPLIES:
@@ -164,9 +169,11 @@ def process_post(post):
                     ' limit ' + str(MAX_REPLIES / 10))
                 conn.commit()
                 logger.debug('Cleared some rows in table ' + table)
+                print('Cleared some rows in table', table)
 
 def prepare_reply(index, value, count):
     logger.info('Deck #' + str(index) + ' - ' + value[1])
+    print('Deck #', str(index), '-', value[1])
     reply = '[Deck #' + str(index) + '](' + value[0] + ')  \n'
     deck = get_deck_info(value[1])
 
@@ -180,6 +187,7 @@ def prepare_reply(index, value, count):
         reply += '\n***\n\n'
 
     logger.debug('Reply content is ready')
+    print('Reply content is ready')
     return reply
 
 def get_deck_info(deck):
@@ -203,9 +211,11 @@ def get_deck_info(deck):
             if card_id not in unique_ids:
                 unique_ids.append(card_id)
                 logger.debug('new card found: ' + str(card_id))
+                print('new card found:', str(card_id))
             else:
                 errors.append('duplicate card ' + str(card_id))
                 logger.debug('duplicate card found: ' + str(card_id))
+                print('duplicate card found:', str(card_id))
 
             theme_name = get_theme_name(CARD_DATA[card_id]['theme'])
             if theme_name not in themes and theme_name != 'Unknown':
@@ -213,9 +223,11 @@ def get_deck_info(deck):
                 if theme_name != 'Neutral':
                     theme_count += 1
                     logger.debug('new theme found: ' + theme_name)
+                    print('new theme found:', theme_name)
         else:
             cards['Unknown'].append({'name': str(card_id), 'theme': 'unknown'})
             logger.debug('unknow card found: ' + str(card_id))
+            print('unknow card found:', str(card_id))
 
     if len(card_ids) < 12:
         errors.append('not enough cards')
@@ -247,6 +259,7 @@ def get_theme_name(name):
 def generate_error_mesage(errors):
     message = '*Invalid deck: '
     logger.debug('Preparing error message')
+    print('Preparing error message')
 
     for i, error in enumerate(errors):
         message += error
@@ -256,11 +269,13 @@ def generate_error_mesage(errors):
             message += '; '
 
     logger.debug('Error message is ready')
+    print('Error message is ready')
     return message
 
 def generate_deck_summary(themes, cost):
     summary = '**Themes:** '
     logger.debug('Preparing deck summary')
+    print('Preparing deck summary')
 
     for i, theme in enumerate(themes):
         if theme != 'Neutral':
@@ -269,11 +284,13 @@ def generate_deck_summary(themes, cost):
     summary += ('&nbsp;' * 10) + '**Avg. Cost: ' + cost + '**  \n\n'
 
     logger.debug('Deck summary is ready')
+    print('Deck summary is ready')
     return summary
 
 def generate_card_list(cards):
     card_list = ''
     logger.debug('Preparing card list')
+    print('Preparing card list')
 
     for card_class, card in cards.items():
         if len(card) <= 0:
@@ -294,6 +311,7 @@ def generate_card_list(cards):
                 card_list += '  \n'
 
     logger.debug('Card list is ready')
+    print('Card list is ready')
     return card_list
 
 
