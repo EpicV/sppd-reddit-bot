@@ -58,7 +58,13 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 # reddit
-reddit = praw.Reddit('bot1')
+if 'REDDIT_USERNAME' in os.environ:
+    reddit = praw.Reddit(client_id=os.environ['REDDIT_CLIENT_ID'],
+        client_secret=os.environ['REDDIT_CLIENT_SECRET'], user_agent=os.environ['REDDIT_USER_AGENT'],
+        username=os.environ['REDDIT_USERNAME'], password=os.environ['REDDIT_PASSWORD'])
+else:
+    reddit = praw.Reddit('bot1')
+
 # subreddit = reddit.subreddit('SouthParkPhone')
 subreddit = reddit.subreddit('EpicVTestSub')
 
