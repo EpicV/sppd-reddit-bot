@@ -2,7 +2,8 @@ import praw
 import threading
 import time
 import re
-import sqlite3
+from urllib import parse
+import psycopg2
 import logging
 import os
 from collections import OrderedDict
@@ -42,7 +43,6 @@ CLASS_NAMES = {
 
 # get abs path
 path = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(path, 'data', 'db.sqlite3')
 log_path = os.path.join(path, 'data', 'sppd.log')
 
 # create logger
@@ -69,7 +69,24 @@ else:
 subreddit = reddit.subreddit('EpicVTestSub')
 
 # create submissions and comments tables
-conn = sqlite3.connect(db_path, check_same_thread = False)
+if 'DATABASE_URL' in os.environ:
+    parse.uses_netloc.append('postgres')
+    url = parse.urlparse(os.environ['DATABASE_URL'])
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+else:
+    conn = psycopg2.connect(
+        database='sppd_db',
+        user='postgres',
+        password='postgres',
+        host='localhost',
+        port='5432'
+    )
 cursor = conn.cursor()
 cursor.execute('CREATE TABLE IF NOT EXISTS submissions (id TEXT)')
 cursor.execute('CREATE TABLE IF NOT EXISTS comments (id TEXT)')
@@ -136,7 +153,7 @@ def process_post(post):
     else:
         return
 
-    cursor.execute('SELECT * FROM ' + table + ' WHERE id = ?', (post.id,))
+    cursor.execute('SELECT * FROM ' + table + ' WHERE id = %s', (post.id,))
     if cursor.fetchone() is None:
         matches = re.findall(r'(//southparkphone.gg/builder/#/([0-9,]+))', body, re.IGNORECASE)
         matches = OrderedDict((x, True) for x in matches).keys()
@@ -152,7 +169,7 @@ def process_post(post):
         if reply:
             try:
                 post.reply(reply)
-                cursor.execute('INSERT INTO ' + table + ' VALUES (?)', (post.id,))
+                cursor.execute('INSERT INTO ' + table + ' VALUES (%s)', (post.id,))
                 conn.commit()
                 logger.info('Replied to ' + table[:-1] + ' ' + post.id)
                 print('Replied to', table[:-1], post.id)

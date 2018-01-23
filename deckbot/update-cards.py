@@ -1,4 +1,3 @@
-# import sqlite3
 import os
 from urllib import parse
 import psycopg2
@@ -7,7 +6,6 @@ import json
 
 # get abs path
 path = os.path.dirname(os.path.abspath(__file__))
-# db_path = os.path.join(path, 'data', 'db.sqlite3')
 log_path = os.path.join(path, 'data', 'sppd.log')
 card_json = os.path.join(path, 'data', 'cards.json')
 
@@ -31,7 +29,6 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 
 # connect database
-# conn = sqlite3.connect(db_path)
 if 'DATABASE_URL' in os.environ:
     parse.uses_netloc.append('postgres')
     url = parse.urlparse(os.environ['DATABASE_URL'])
@@ -50,10 +47,10 @@ else:
         host='localhost',
         port='5432'
     )
-c = conn.cursor()
+cursor = conn.cursor()
 
 # create table
-c.execute('''CREATE TABLE IF NOT EXISTS cards
+cursor.execute('''CREATE TABLE IF NOT EXISTS cards
     (id INTEGER, name TEXT, theme TEXT, type TEXT, class TEXT,
     rarity TEXT, cost INTEGER)''')
 
@@ -66,12 +63,12 @@ nec_query = 'SELECT id FROM cards WHERE id NOT IN ('
 
 # loop through card data
 for key, card in CARD_DATA.items():
-    c.execute('SELECT * FROM cards WHERE id = ?', (key,))
-    data = c.fetchone()
+    cursor.execute('SELECT * FROM cards WHERE id = %s', (key,))
+    data = cursor.fetchone()
 
     # add new card
     if data is None:
-        c.execute('INSERT INTO cards VALUES (?, ?, ?, ?, ?, ?, ?)',
+        cursor.execute('INSERT INTO cards VALUES (%s, %s, %s, %s, %s, %s, %s)',
             (key, card['name'], card['theme'], card['type'], card['class'],
                 card['rarity'], card['cost'],))
         logger.info('Added card: ' + key + ' - ' + card['name'])
@@ -81,7 +78,7 @@ for key, card in CARD_DATA.items():
     elif (card['name'] != data[1] or card['theme'] != data[2]
             or card['type'] != data[3] or card['class'] != data[4]
             or card['rarity'] != data[5] or int(card['cost']) != data[6]):
-        c.execute('''UPDATE cards
+        cursor.execute('''UPDATE cards
             SET name = ?, theme = ?, type = ?, class = ?, rarity = ?, cost = ?
             WHERE id = ?''', (card['name'], card['theme'], card['type'],
                 card['class'], card['rarity'], card['cost'], key,))
@@ -92,11 +89,11 @@ for key, card in CARD_DATA.items():
     nec_query += key + ', '
 
 # find non existing records
-c.execute(nec_query[:-2] + ')')
-nec = c.fetchall()
+cursor.execute(nec_query[:-2] + ')')
+nec = cursor.fetchall()
 if len(nec) > 0:
     ids = ', '.join(map(str,list(zip(*nec))[0]))
-    c.execute('DELETE FROM cards WHERE id IN (' + ids + ')')
+    cursor.execute('DELETE FROM cards WHERE id IN (' + ids + ')')
     logger.info('Deleted cards: ' + ids)
     print('Deleted cards:', ids)
 
