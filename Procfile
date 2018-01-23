@@ -1,3 +1,3 @@
-worker: python card-spider.py
-worker: python update-cards.py
-worker: python deck-bot.py
+card-spider: python card-spider.py
+update-cards: python update-cards.py
+deck-bot: python deck-bot.py
