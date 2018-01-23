@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "be540a4cbe23d4cf4bb41b68284ae5a1fdf7a9864778f4746c6ab3148fd48d09"
+            "sha256": "43b6973be686ebc79d1b522390775b91e815c7c682ac879d8e02bd90ccda36bd"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -28,6 +28,13 @@
         ]
     },
     "default": {
+        "apscheduler": {
+            "hashes": [
+                "sha256:443d015339ceca347f9ed14a66e9b610f99f19f8ef9048aa1cdabee2560824e1",
+                "sha256:952c8f46a11f32b9d5bfbe3e347dac2cdf0680d8b4799590dc9c3a9865b73b65"
+            ],
+            "version": "==3.5.1"
+        },
         "asn1crypto": {
             "hashes": [
                 "sha256:2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87",
@@ -303,6 +310,20 @@
             ],
             "version": "==17.5.0"
         },
+        "pytz": {
+            "hashes": [
+                "sha256:80af0f3008046b9975242012a985f04c5df1f01eed4ec1633d56cc47a75a6a48",
+                "sha256:feb2365914948b8620347784b6b6da356f31c9d03560259070b2f30cff3d469d",
+                "sha256:59707844a9825589878236ff2f4e0dc9958511b7ffaae94dc615da07d4a68d33",
+                "sha256:d0ef5ef55ed3d37854320d4926b04a4cb42a2e88f71da9ddfdacfde8e364f027",
+                "sha256:c41c62827ce9cafacd6f2f7018e4f83a6f1986e87bfd000b8cfbd4ab5da95f1a",
+                "sha256:8cc90340159b5d7ced6f2ba77694d946fc975b09f1a51d93f3ce3bb399396f94",
+                "sha256:dd2e4ca6ce3785c8dd342d1853dd9052b19290d5bf66060846e5dc6b8d6667f7",
+                "sha256:699d18a2a56f19ee5698ab1123bbcc1d269d061996aeb1eda6d89248d3542b82",
+                "sha256:fae4cffc040921b8a2d60c6cf0b5d662c1190fe54d718271db4eb17d44a185b7"
+            ],
+            "version": "==2017.3"
+        },
         "queuelib": {
             "hashes": [
                 "sha256:c97f2120e070e2b8a5e8a60afe10bd7b3ae70c0994d6bb9c4d802b0448241339",
@@ -345,6 +366,12 @@
                 "sha256:0da1a7e35d5fcae37bc9c7978970b5feb3bc82822155b8654ec63925c05af75c"
             ],
             "version": "==17.9.0"
+        },
+        "tzlocal": {
+            "hashes": [
+                "sha256:4ebeb848845ac898da6519b9b31879cf13b6626f7184c496037b818e238f2c4e"
+            ],
+            "version": "==1.5.1"
         },
         "update-checker": {
             "hashes": [

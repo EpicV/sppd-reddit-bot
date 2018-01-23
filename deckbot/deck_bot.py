@@ -186,7 +186,7 @@ def process_post(post):
                     ' limit ' + str(MAX_REPLIES / 10))
                 conn.commit()
                 logger.debug('Cleared some rows in table ' + table)
-                print('Cleared some rows in table', table)
+                # print('Cleared some rows in table', table)
 
 def prepare_reply(index, value, count):
     logger.info('Deck #' + str(index) + ' - ' + value[1])
@@ -204,7 +204,7 @@ def prepare_reply(index, value, count):
         reply += '\n***\n\n'
 
     logger.debug('Reply content is ready')
-    print('Reply content is ready')
+    # print('Reply content is ready')
     return reply
 
 def get_deck_info(deck):
@@ -228,11 +228,11 @@ def get_deck_info(deck):
             if card_id not in unique_ids:
                 unique_ids.append(card_id)
                 logger.debug('new card found: ' + str(card_id))
-                print('new card found:', str(card_id))
+                # print('new card found:', str(card_id))
             else:
                 errors.append('duplicate card ' + str(card_id))
                 logger.debug('duplicate card found: ' + str(card_id))
-                print('duplicate card found:', str(card_id))
+                # print('duplicate card found:', str(card_id))
 
             theme_name = get_theme_name(CARD_DATA[card_id]['theme'])
             if theme_name not in themes and theme_name != 'Unknown':
@@ -240,11 +240,11 @@ def get_deck_info(deck):
                 if theme_name != 'Neutral':
                     theme_count += 1
                     logger.debug('new theme found: ' + theme_name)
-                    print('new theme found:', theme_name)
+                    # print('new theme found:', theme_name)
         else:
             cards['Unknown'].append({'name': str(card_id), 'theme': 'unknown'})
             logger.debug('unknow card found: ' + str(card_id))
-            print('unknow card found:', str(card_id))
+            # print('unknow card found:', str(card_id))
 
     if len(card_ids) < 12:
         errors.append('not enough cards')
@@ -276,7 +276,7 @@ def get_theme_name(name):
 def generate_error_mesage(errors):
     message = '*Invalid deck: '
     logger.debug('Preparing error message')
-    print('Preparing error message')
+    # print('Preparing error message')
 
     for i, error in enumerate(errors):
         message += error
@@ -286,13 +286,13 @@ def generate_error_mesage(errors):
             message += '; '
 
     logger.debug('Error message is ready')
-    print('Error message is ready')
+    # print('Error message is ready')
     return message
 
 def generate_deck_summary(themes, cost):
     summary = '**Themes:** '
     logger.debug('Preparing deck summary')
-    print('Preparing deck summary')
+    # print('Preparing deck summary')
 
     for i, theme in enumerate(themes):
         if theme != 'Neutral':
@@ -301,13 +301,13 @@ def generate_deck_summary(themes, cost):
     summary += ('&nbsp;' * 10) + '**Avg. Cost: ' + cost + '**  \n\n'
 
     logger.debug('Deck summary is ready')
-    print('Deck summary is ready')
+    # print('Deck summary is ready')
     return summary
 
 def generate_card_list(cards):
     card_list = ''
     logger.debug('Preparing card list')
-    print('Preparing card list')
+    # print('Preparing card list')
 
     for card_class, card in cards.items():
         if len(card) <= 0:
@@ -328,7 +328,7 @@ def generate_card_list(cards):
                 card_list += '  \n'
 
     logger.debug('Card list is ready')
-    print('Card list is ready')
+    # print('Card list is ready')
     return card_list
 
 

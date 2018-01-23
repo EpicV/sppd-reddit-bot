@@ -9,6 +9,7 @@ verify_ssl = true
 praw = "*"
 scrapy = "*"
 psycopg2 = "*"
+apscheduler = "*"
 
 
 [requires]
