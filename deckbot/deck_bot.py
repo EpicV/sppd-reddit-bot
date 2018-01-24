@@ -1,5 +1,5 @@
 import praw
-import threading
+# import threading
 import time
 import re
 from urllib import parse
@@ -107,22 +107,25 @@ for row in cursor.fetchall():
         'cost': row[6]
     }
 
-class streamThread (threading.Thread):
-    def __init__(self, threadID, table):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.table = table
-    def run(self):
-        process_stream(self.table)
+# class streamThread (threading.Thread):
+#     def __init__(self, threadID, table):
+#         threading.Thread.__init__(self)
+#         self.threadID = threadID
+#         self.table = table
+#     def run(self):
+#         process_stream(self.table)
 
 def main():
-    thread1 = streamThread(1, 'submissions')
-    thread2 = streamThread(2, 'comments')
+    # thread1 = streamThread(1, 'submissions')
+    # thread2 = streamThread(2, 'comments')
 
-    thread1.start()
-    thread2.start()
-    thread1.join()
-    thread2.join()
+    # thread1.start()
+    # thread2.start()
+    # thread1.join()
+    # thread2.join()
+    process_stream('submissions')
+    process_stream('comments')
+    conn.close()
 
 def process_stream(table):
     logger.info('Start checking ' + table)
