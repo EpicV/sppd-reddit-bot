@@ -4,12 +4,13 @@ import time
 import re
 from urllib import parse
 import psycopg2
+from psycopg2 import sql
 import logging
 import os
 from collections import OrderedDict
 
 # constants
-MAX_REPLIES = 200
+MAX_REPLIES = 5
 THEME_NAMES = {
     'adventure': 'Adventure',
     'sci': 'Sci-Fi',
@@ -153,7 +154,9 @@ def process_post(post):
     else:
         return
 
-    cursor.execute('SELECT * FROM ' + table + ' WHERE id = %s', (post.id,))
+    cursor.execute(sql.SQL('SELECT * FROM {} WHERE id = %s')
+        .format(sql.Identifier(table)),
+    [post.id])
     if cursor.fetchone() is None:
         matches = re.findall(r'(//southparkphone.gg/builder/#/([0-9,]+))', body, re.IGNORECASE)
         matches = OrderedDict((x, True) for x in matches).keys()
@@ -169,21 +172,24 @@ def process_post(post):
         if reply:
             try:
                 post.reply(reply)
-                cursor.execute('INSERT INTO ' + table + ' VALUES (%s)', (post.id,))
+                cursor.execute(sql.SQL('INSERT INTO {} VALUES (%s)')
+                    .format(sql.Identifier(table)),
+                [post.id])
                 conn.commit()
                 logger.info('Replied to ' + table[:-1] + ' ' + post.id)
                 print('Replied to', table[:-1], post.id)
             except:
-                time.sleep(30)
-                process_stream(post, table)
                 logger.exception('Unable to reply ' + table[:-1] + ' ' + post.id)
                 print('Unable to reply', table[:-1], post.id)
+                time.sleep(30)
+                process_stream(post, table)
 
-            cursor.execute('SELECT * FROM ' + table)
+            cursor.execute(sql.SQL('SELECT * FROM {}').format(sql.Identifier(table)))
             if len(cursor.fetchall()) > MAX_REPLIES:
-                cursor.execute('DELETE FROM ' + table +
-                    ' WHERE rowid IN (SELECT rowid from ' + table +
-                    ' limit ' + str(MAX_REPLIES / 10))
+                cursor.execute(sql.SQL('DELETE FROM {0} WHERE CTID IN '
+                    '(SELECT CTID from {1} limit %s)')
+                    .format(sql.Identifier(table), sql.Identifier(table)),
+                [str(int(MAX_REPLIES / 10))])
                 conn.commit()
                 logger.debug('Cleared some rows in table ' + table)
                 # print('Cleared some rows in table', table)
