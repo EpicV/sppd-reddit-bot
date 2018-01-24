@@ -69,43 +69,9 @@ else:
 # subreddit = reddit.subreddit('SouthParkPhone')
 subreddit = reddit.subreddit('EpicVTestSub')
 
-# create submissions and comments tables
-if 'DATABASE_URL' in os.environ:
-    parse.uses_netloc.append('postgres')
-    url = parse.urlparse(os.environ['DATABASE_URL'])
-    conn = psycopg2.connect(
-        database=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port
-    )
-else:
-    conn = psycopg2.connect(
-        database='sppd_db',
-        user='postgres',
-        password='postgres',
-        host='localhost',
-        port='5432'
-    )
-cursor = conn.cursor()
-cursor.execute('CREATE TABLE IF NOT EXISTS submissions (id TEXT)')
-cursor.execute('CREATE TABLE IF NOT EXISTS comments (id TEXT)')
-conn.commit()
-
-# read data from database
-cursor.execute('SELECT * FROM cards')
-
+conn = None
+cursor = None
 CARD_DATA = {}
-for row in cursor.fetchall():
-    CARD_DATA[row[0]] = {
-        'name': row[1],
-        'theme': row[2],
-        'type': row[3],
-        'class': row[4],
-        'rarity': row[5],
-        'cost': row[6]
-    }
 
 # class streamThread (threading.Thread):
 #     def __init__(self, threadID, table):
@@ -116,6 +82,7 @@ for row in cursor.fetchall():
 #         process_stream(self.table)
 
 def main():
+    initialize()
     # thread1 = streamThread(1, 'submissions')
     # thread2 = streamThread(2, 'comments')
 
@@ -126,6 +93,44 @@ def main():
     process_stream('submissions')
     process_stream('comments')
     conn.close()
+
+def initialize():
+    # create submissions and comments tables
+    global conn, cursor, CARD_DATA
+    if 'DATABASE_URL' in os.environ:
+        parse.uses_netloc.append('postgres')
+        url = parse.urlparse(os.environ['DATABASE_URL'])
+        conn = psycopg2.connect(
+            database=url.path[1:],
+            user=url.username,
+            password=url.password,
+            host=url.hostname,
+            port=url.port
+        )
+    else:
+        conn = psycopg2.connect(
+            database='sppd_db',
+            user='postgres',
+            password='postgres',
+            host='localhost',
+            port='5432'
+        )
+    cursor = conn.cursor()
+    cursor.execute('CREATE TABLE IF NOT EXISTS submissions (id TEXT)')
+    cursor.execute('CREATE TABLE IF NOT EXISTS comments (id TEXT)')
+    conn.commit()
+
+    # read data from database
+    cursor.execute('SELECT * FROM cards')
+    for row in cursor.fetchall():
+        CARD_DATA[row[0]] = {
+            'name': row[1],
+            'theme': row[2],
+            'type': row[3],
+            'class': row[4],
+            'rarity': row[5],
+            'cost': row[6]
+        }
 
 def process_stream(table):
     logger.info('Start checking ' + table)
