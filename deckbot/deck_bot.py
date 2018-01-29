@@ -186,11 +186,11 @@ def process_post(post):
                 conn.commit()
                 logger.info('Replied to ' + table[:-1] + ' ' + post.id)
                 print('Replied to', table[:-1], post.id)
-            except:
-                logger.exception('Unable to reply ' + table[:-1] + ' ' + post.id)
-                print('Unable to reply', table[:-1], post.id)
+            except Exception, e:
+                logger.exception(e)
+                print('Unable to reply', table[:-1], post.id, ':', str(e))
                 time.sleep(30)
-                process_stream(post, table)
+                process_post(post)
 
             cursor.execute(sql.SQL('SELECT * FROM {}').format(sql.Identifier(table)))
             if len(cursor.fetchall()) > MAX_REPLIES:
