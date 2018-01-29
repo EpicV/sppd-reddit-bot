@@ -186,7 +186,7 @@ def process_post(post):
                 conn.commit()
                 logger.info('Replied to ' + table[:-1] + ' ' + post.id)
                 print('Replied to', table[:-1], post.id)
-            except Exception, e:
+            except Exception as e:
                 logger.exception(e)
                 print('Unable to reply', table[:-1], post.id, ':', str(e))
                 time.sleep(30)
