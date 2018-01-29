@@ -189,8 +189,8 @@ def process_post(post):
             except Exception as e:
                 logger.exception(e)
                 print('Unable to reply', table[:-1], post.id, ':', str(e))
-                time.sleep(30)
-                process_post(post)
+                # time.sleep(30)
+                # process_post(post)
 
             cursor.execute(sql.SQL('SELECT * FROM {}').format(sql.Identifier(table)))
             if len(cursor.fetchall()) > MAX_REPLIES:
