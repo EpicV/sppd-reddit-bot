@@ -66,8 +66,8 @@ if 'REDDIT_USERNAME' in os.environ:
 else:
     reddit = praw.Reddit('bot1')
 
-# subreddit = reddit.subreddit('SouthParkPhone')
-subreddit = reddit.subreddit('EpicVTestSub')
+subreddit = reddit.subreddit('SouthParkPhone')
+# subreddit = reddit.subreddit('EpicVTestSub')
 
 conn = None
 cursor = None
